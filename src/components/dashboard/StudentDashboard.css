@@ -1,0 +1,14 @@
+.student-dashboard-container {
+    padding: 20px;
+  }
+  
+  .student-item-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .student-item-list li {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  

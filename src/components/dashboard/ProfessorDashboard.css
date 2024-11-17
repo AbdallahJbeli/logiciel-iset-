@@ -1,0 +1,23 @@
+.dashboard-container {
+    padding: 20px;
+  }
+  
+  .add-item {
+    margin-bottom: 20px;
+  }
+  
+  .item-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .item-list li {
+    margin-bottom: 10px;
+  }
+  
+  button {
+    margin-left: 10px;
+  }
+
+  
+  
