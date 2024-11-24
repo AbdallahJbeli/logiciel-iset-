@@ -1,48 +1,44 @@
-// student dashboard.js
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import './StudentDashboard.css';
+import React, { useState, useEffect } from 'react';
+import '../dashboard/StudentDashboard.css'
+import axios from 'axios';
 
 const StudentDashboard = () => {
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true); // New state for loading
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchItems();
   }, []);
 
   const fetchItems = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/student/items", { withCredentials: true });
+      const response = await axios.get('http://localhost:5000/student/items', { withCredentials: true });
       setItems(response.data);
     } catch (error) {
-      console.error("Error fetching items:", error);
+      console.error('Error fetching items:', error);
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
   return (
     <div className="student-dashboard-container">
       <h2>Student Dashboard</h2>
-      {loading ? ( // Conditional rendering based on loading state
+      {loading ? (
         <p>Loading...</p>
       ) : (
-        <ul className="student-item-list">
+        <ul>
           {items.length > 0 ? (
             items.map((item) => (
               <li key={item.id}>
-                <span>{item.title}</span>
-                {item.file_path && (
-                  <a href={`http://localhost:5000/uploads/${item.file_path}`} target="_blank" rel="noopener noreferrer">
-                    View File
-                  </a>
-                )}
+                <h3>{item.title}</h3>
+                <p>{item.note}</p>
+                {item.file_path && <a href={`http://localhost:5000/uploads/${item.file_path}`} download>Download File</a>}
               </li>
             ))
           ) : (
-            <p>No items available</p>
+            <p>No notes available.</p>
           )}
         </ul>
       )}

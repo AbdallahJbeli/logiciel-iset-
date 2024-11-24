@@ -1,98 +1,78 @@
-// ProfessorDashboard.js
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import './ProfessorDashboard.css';
+import React, { useState } from 'react';
+import '../dashboard/ProfessorDashboard.css'
+import axios from 'axios';
 
 const ProfessorDashboard = () => {
-  const [items, setItems] = useState([]);
-  const [newItem, setNewItem] = useState("");
-  const [editItem, setEditItem] = useState(null);
-  const [editText, setEditText] = useState("");
+  const [title, setTitle] = useState('');
+  const [note, setNote] = useState('');  // State to store the note
+  const [file, setFile] = useState(null);
 
-  // Fetch existing items (e.g., assignments, resources) from the database
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
-  const fetchItems = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/professor/items", { withCredentials: true });
-      setItems(response.data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-    }
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
-  // Add new item
-  const handleAddItem = async () => {
-    try {
-      await axios.post("http://localhost:5000/professor/items", { title: newItem }, { withCredentials: true });
-      setNewItem("");
-      fetchItems(); // Refresh the list after adding
-    } catch (error) {
-      console.error("Error adding item:", error);
-    }
-  };
+  const handleUpload = async (e) => {
+    e.preventDefault();
 
-  // Update item
-  const handleUpdateItem = async (id) => {
-    try {
-      await axios.put(`http://localhost:5000/professor/items/${id}`, { title: editText }, { withCredentials: true });
-      setEditItem(null);
-      fetchItems(); // Refresh the list after updating
-    } catch (error) {
-      console.error("Error updating item:", error);
+    if (!file) {
+      alert('Please select a file to upload');
+      return;
     }
-  };
 
-  // Delete item
-  const handleDeleteItem = async (id) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('note', note);
+    formData.append('file', file);
+
     try {
-      await axios.delete(`http://localhost:5000/professor/items/${id}`, { withCredentials: true });
-      fetchItems(); // Refresh the list after deleting
+      const response = await axios.post('http://localhost:5000/professor/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      });
+      alert('File and note uploaded successfully');
     } catch (error) {
-      console.error("Error deleting item:", error);
+      console.error('Error uploading file and note:', error);
+      alert('Error uploading file and note');
     }
   };
 
   return (
-    <div className="dashboard-container">
+    <div className="professor-dashboard-container">
       <h2>Professor Dashboard</h2>
-
-      {/* Add New Item */}
-      <div className="add-item">
-        <input
-          type="text"
-          value={newItem}
-          onChange={(e) => setNewItem(e.target.value)}
-          placeholder="Add new item"
-        />
-        <button onClick={handleAddItem}>Add Item</button>
-      </div>
-
-      {/* Display List of Items */}
-      <ul className="item-list">
-        {items.map((item) => (
-          <li key={item.id}>
-            {editItem === item.id ? (
-              <>
-                <input
-                  type="text"
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                />
-                <button onClick={() => handleUpdateItem(item.id)}>Save</button>
-              </>
-            ) : (
-              <>
-                <span>{item.title}</span>
-                <button onClick={() => { setEditItem(item.id); setEditText(item.title); }}>Edit</button>
-                <button onClick={() => handleDeleteItem(item.id)}>Delete</button>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
+      <form onSubmit={handleUpload}>
+        <div className="input-group">
+          <label htmlFor="title">Title</label>
+          <input
+            type="text"
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="note">Note</label>
+          <textarea
+            id="note"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            required
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="file">Upload File</label>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            onChange={handleFileChange}
+            required
+          />
+        </div>
+        <button type="submit">Upload</button>
+      </form>
     </div>
   );
 };
